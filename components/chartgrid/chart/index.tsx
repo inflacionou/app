@@ -19,15 +19,7 @@ import {
 } from "@/components/ui/chart"
 
 import { format } from "date-fns"
-
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+import { ProductWithPrices } from "@/types/Product"
 
 const chartConfig = {
   price: {
@@ -36,24 +28,14 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-type ChartData = {
-  name: string;
-  id: string;
-  prices: Array<{
-    price: string;
-    pricePerKilo: string;
-    updateTime: string;
-  }>
-}
-
-export default function Component({ data }: { data: ChartData }) {
-
-  const initialDate = () => {
-    return format(new Date(data.prices[data.prices.length - 1].updateTime), "dd/MM/yyyy")
-  }
+export default function Component({ data }: { data: ProductWithPrices }) {
 
   const finalDate = () => {
-    return format(new Date(data.prices[0].updateTime), "dd/MM/yyyy")
+    return data.prices[data.prices.length - 1].updateTime.toString()
+  }
+
+  const initialDate = () => {
+    return data.prices[0].updateTime.toString()
   }
 
   const maskMoney = (value: string) => {
@@ -63,7 +45,7 @@ export default function Component({ data }: { data: ChartData }) {
   }
 
   return (
-    <Card className="bg-gray-50 z-10">
+    <Card className="bg-white z-10">
       <CardHeader>
         <CardTitle>{data.name}</CardTitle>
         <CardDescription>{initialDate()} - {finalDate()}</CardDescription>
@@ -85,7 +67,6 @@ export default function Component({ data }: { data: ChartData }) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <ChartTooltip
               cursor={false}

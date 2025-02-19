@@ -4,25 +4,13 @@ import { DotPattern } from "@/components/magicui/dot-pattern";
 import { cn } from "@/lib/utils";
 import { motion } from "motion/react";
 import { Button } from "@/components/ui/button"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Loader2 } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { ChartGrid } from "@/components/chartgrid";
-
-import { useEffect, useState } from "react";
-import { getProducts } from "@/server/actions/products"
+import { usePagedCharts } from "@/hooks/usePagedCharts";
 
 export default function Home() {
-  const [chartsData, setChartsData] = useState<any | null>(null)
-
-  useEffect(() => {
-    async function getP() {
-      const products = await getProducts()
-      console.log(products)
-      setChartsData(products)
-    }
-
-    getP()
-  }, [])
+  const { data, nextPage, hasNextPage, loading } = usePagedCharts()
 
   return (
     <div className="flex flex-col flex-1 items-center justify-center">
@@ -50,7 +38,20 @@ export default function Home() {
         </div>
       </motion.div>
 
-      <ChartGrid data={chartsData} />
+      <ChartGrid data={data} loading={loading} />
+
+      {hasNextPage() && (
+        <div className="w-full flex p-4 items-center justify-center">
+          <Button onClick={nextPage} disabled={loading}>
+            {loading && (<>
+              <Loader2 className="animate-spin" />
+              Carregando
+            </>)}
+
+            {!loading && (<>Carregar Mais</>)}
+          </Button>
+        </div>
+      )}
     </div>
   );
 }
